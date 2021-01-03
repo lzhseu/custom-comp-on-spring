@@ -20,7 +20,7 @@ public class HelloService {
     }
 
     public void sayHello(String speaker, String msg, Date date) {
-        System.out.println(speaker + "said that " + msg + " on " + date);
+        System.out.println(speaker + " said that " + msg + " on " + date);
     }
 
 }

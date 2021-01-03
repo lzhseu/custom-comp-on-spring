@@ -2,6 +2,7 @@ package top.lzhseu.simpleaop.spring;
 
 import net.sf.cglib.proxy.Enhancer;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import top.lzhseu.simpleaop.holder.ProxyBeanHolder;
 import top.lzhseu.simpleaop.interceptor.AspectProxyInterceptor;
@@ -26,10 +27,17 @@ public class SimpleAopBeanPostProcessor implements BeanPostProcessor {
         if (proxyBeanHolders.containsKey(className)) {
             Enhancer enhancer = new Enhancer();
             enhancer.setSuperclass(result.getClass());
-            enhancer.setCallback(new AspectProxyInterceptor(proxyBeanHolders.get(className)));
+            AspectProxyInterceptor aspectProxyInterceptor = getAspectProxyInterceptor();
+            aspectProxyInterceptor.setProxyBeanHolders(proxyBeanHolders.get(className));
+            enhancer.setCallback(aspectProxyInterceptor);
             result = enhancer.create();
         }
 
         return result;
+    }
+
+    @Lookup
+    public AspectProxyInterceptor getAspectProxyInterceptor() {
+        return null;
     }
 }

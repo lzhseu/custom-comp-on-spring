@@ -1,9 +1,14 @@
 package top.lzhseu.simpleaop.interceptor;
 
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import top.lzhseu.simpleaop.enums.PointCutTypeEum;
-import top.lzhseu.simpleaop.example.AspectLogic;
 import top.lzhseu.simpleaop.holder.ProxyBeanHolder;
 
 import java.lang.reflect.Method;
@@ -13,7 +18,13 @@ import java.util.List;
  * @author lzh
  * @date 2021/1/2 20:07
  */
-public class AspectProxyInterceptor implements MethodInterceptor {
+@Component
+@Scope("prototype")
+@NoArgsConstructor
+@Setter
+public class AspectProxyInterceptor implements MethodInterceptor, BeanFactoryAware {
+
+    private BeanFactory beanFactory;
 
     private List<ProxyBeanHolder> proxyBeanHolders;
 
@@ -30,9 +41,10 @@ public class AspectProxyInterceptor implements MethodInterceptor {
                     (proxyBeanHolder.getAdviceType().equals(PointCutTypeEum.BEFORE) ||
                             proxyBeanHolder.getAdviceType().equals(PointCutTypeEum.AROUND))) {
 
-                Class clazz = Class.forName(proxyBeanHolder.getAspectClassName());
+                Class<?> clazz = Class.forName(proxyBeanHolder.getAspectClassName());
+                Object instance = beanFactory.getBean(clazz);
                 Method proxyMethod = proxyBeanHolder.getAdviceMethod();
-                proxyMethod.invoke(clazz.newInstance());
+                proxyMethod.invoke(instance);
 
             }
         }
@@ -47,9 +59,10 @@ public class AspectProxyInterceptor implements MethodInterceptor {
                     (proxyBeanHolder.getAdviceType().equals(PointCutTypeEum.AFTER) ||
                             proxyBeanHolder.getAdviceType().equals(PointCutTypeEum.AROUND))) {
 
-                Class clazz = Class.forName(proxyBeanHolder.getAspectClassName());
+                Class<?> clazz = Class.forName(proxyBeanHolder.getAspectClassName());
+                Object instance = beanFactory.getBean(clazz);
                 Method proxyMethod = proxyBeanHolder.getAdviceMethod();
-                proxyMethod.invoke(clazz.newInstance());
+                proxyMethod.invoke(instance);
 
             }
         }
